@@ -1,0 +1,7 @@
+[
+  {"model": "catalog.intensitytechnique", "pk": 1, "fields": {"name": "Drop set", "description": "Reduce weight progressively within a set", "status": true, "created": "2026-01-01T00:00:00Z", "updated": "2026-01-01T00:00:00Z"}},
+  {"model": "catalog.intensitytechnique", "pk": 2, "fields": {"name": "Pyramid", "description": "Increase or decrease weight each set", "status": true, "created": "2026-01-01T00:00:00Z", "updated": "2026-01-01T00:00:00Z"}},
+  {"model": "catalog.intensitytechnique", "pk": 3, "fields": {"name": "Rest-pause", "description": "Brief rest inside a single set", "status": true, "created": "2026-01-01T00:00:00Z", "updated": "2026-01-01T00:00:00Z"}},
+  {"model": "catalog.intensitytechnique", "pk": 4, "fields": {"name": "Superset", "description": "Two exercises back to back", "status": true, "created": "2026-01-01T00:00:00Z", "updated": "2026-01-01T00:00:00Z"}},
+  {"model": "catalog.intensitytechnique", "pk": 5, "fields": {"name": "AMRAP", "description": "As many reps as possible", "status": true, "created": "2026-01-01T00:00:00Z", "updated": "2026-01-01T00:00:00Z"}}
+]
