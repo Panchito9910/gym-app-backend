@@ -1,7 +1,7 @@
 # PLAN - Backend de Rutinas de Gimnasio
 
 > Documento de planificación. Define arquitectura, modelo de datos, endpoints y fases de implementación.
-> Stack confirmado: **Django 6.1 + DRF + SimpleJWT + SQL Server**.
+> Stack confirmado: **Django 6.1 + DRF + SimpleJWT + PostgreSQL**.
 
 ---
 
@@ -25,7 +25,8 @@ Backend para una aplicación de rutinas de gimnasio que permita:
 | Framework | Django 6.1 | Ya inicializado en `gym_app/` |
 | API | Django REST Framework | Estándar con Django |
 | Auth | `djangorestframework-simplejwt` | JWT con refresh tokens out-of-the-box |
-| DB driver | `mssql-django` + `pyodbc` | Driver oficial Microsoft para SQL Server |
+| DB driver | `psycopg2-binary` | Driver PostgreSQL para Python |
+| | `dj-database-url` | Parseo de DATABASE_URL para Render |
 | Env vars | `python-decouple` | Lectura robusta de `.env` |
 | CORS | `django-cors-headers` | Si hay frontend separado |
 | Docs API | `drf-spectacular` | OpenAPI/Swagger automático |
@@ -282,7 +283,7 @@ gym-app-backend/
 
 ---
 
-## 6. Configuración de SQL Server
+## 6. Configuración de PostgreSQL
 
 ### 6.1 Dependencias
 
@@ -290,42 +291,43 @@ gym-app-backend/
 Django==6.1
 djangorestframework
 djangorestframework-simplejwt
-mssql-django
-pyodbc
+psycopg2-binary
+dj-database-url
 python-decouple
 django-cors-headers
 drf-spectacular
 ```
-
-Driver ODBC: **ODBC Driver 18 for SQL Server** (instalado en el sistema).
 
 ### 6.2 Settings (`gym_app/settings/base.py`)
 
 ```python
 DATABASES = {
     'default': {
-        'ENGINE': 'mssql',
-        'NAME': config('DB_NAME'),
-        'USER': config('DB_USER'),
-        'PASSWORD': config('DB_PASSWORD'),
-        'HOST': config('DB_HOST'),
-        'PORT': config('DB_PORT', default='1433'),
-        'OPTIONS': {
-            'driver': 'ODBC Driver 18 for SQL Server',
-            'extra_params': 'TrustServerCertificate=yes',
-            # para Azure SQL: 'encrypt': 'yes',
-        },
+        'ENGINE': config('DB_ENGINE', default='django.db.backends.postgresql'),
+        'NAME': config('DB_NAME', default='gym_app'),
+        'USER': config('DB_USER', default='postgres'),
+        'PASSWORD': config('DB_PASSWORD', default=''),
+        'HOST': config('DB_HOST', default='localhost'),
+        'PORT': config('DB_PORT', default='5432'),
     }
 }
 ```
 
-> En SQL Server, Django usará `BigAutoField` por defecto y se respetará la convención de nombres.
+### 6.3 Settings producción (`gym_app/settings/production.py`)
 
-### 6.3 Migraciones
+```python
+import dj_database_url
+DATABASES['default'] = dj_database_url.config(conn_max_age=600, ssl_require=True)
+```
+
+> En producción (Render), se usa `DATABASE_URL` automáticamente.
+
+### 6.4 Migraciones
 
 - Definir modelos en Django que reflejen las tablas corregidas.
 - `python manage.py makemigrations` + `python manage.py migrate`.
 - Para campos `BIT` usar `BooleanField`; para `DATETIME` usar `DateTimeField` con `auto_now_add`/`auto_now`.
+- PostgreSQL usa `SERIAL`/`BIGSERIAL` para auto-incrementales, Django lo gestiona automáticamente con `BigAutoField`.
 
 ---
 
@@ -480,12 +482,12 @@ DJANGO_SECRET_KEY=change-me
 DJANGO_DEBUG=False
 DJANGO_ALLOWED_HOSTS=localhost,127.0.0.1
 
+DB_ENGINE=django.db.backends.postgresql
 DB_NAME=gym_app
-DB_USER=sa
+DB_USER=postgres
 DB_PASSWORD=change-me
 DB_HOST=localhost
-DB_PORT=1433
-DB_DRIVER=ODBC Driver 18 for SQL Server
+DB_PORT=5432
 
 JWT_ACCESS_MINUTES=15
 JWT_REFRESH_DAYS=7
@@ -560,7 +562,7 @@ pip install -r requirements.txt
 
 # 3. Variables de entorno
 cp .env.example .env
-# editar .env con credenciales de SQL Server
+# editar .env con credenciales de PostgreSQL
 
 # 4. Migraciones + seed
 python manage.py migrate

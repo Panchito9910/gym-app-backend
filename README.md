@@ -1,6 +1,6 @@
 # Gym App Backend
 
-REST API para gestión de rutinas de gimnasio. Stack **Django 6.1 + DRF + SimpleJWT + SQL Server**.
+REST API para gestión de rutinas de gimnasio. Stack **Django 6.1 + DRF + SimpleJWT + PostgreSQL**.
 
 ## Estructura
 
@@ -36,9 +36,9 @@ pip install -r requirements.txt
 
 # 3. Configurar variables
 cp .env.example .env
-# Editar .env con tu servidor SQL Server (DB_HOST, DB_USER, DB_PASSWORD...)
+# Editar .env con tu servidor PostgreSQL (DB_HOST, DB_USER, DB_PASSWORD...)
 
-# 4. Crear la base de datos en SQL Server
+# 4. Crear la base de datos en PostgreSQL
 #    CREATE DATABASE gym_app;
 
 # 5. Migrar
@@ -74,11 +74,10 @@ Usa SQLite en memoria (configurado en `settings/test.py`) para velocidad.
 | `DJANGO_DEBUG` | `True` | Modo debug |
 | `DJANGO_SECRET_KEY` | - | Clave secreta JWT |
 | `DJANGO_ALLOWED_HOSTS` | `localhost,127.0.0.1` | Hosts permitidos |
-| `DB_ENGINE` | `mssql` | Engine Django |
+| `DB_ENGINE` | `django.db.backends.postgresql` | Engine Django |
 | `DB_NAME` | `gym_app` | Nombre BD |
 | `DB_USER` / `DB_PASSWORD` | - | Credenciales |
-| `DB_HOST` / `DB_PORT` | `localhost` / `1433` | Servidor SQL Server |
-| `DB_DRIVER` | `ODBC Driver 18 for SQL Server` | Driver ODBC |
+| `DB_HOST` / `DB_PORT` | `localhost` / `5432` | Servidor PostgreSQL |
 | `JWT_ACCESS_MINUTES` | `15` | Vida access token |
 | `JWT_REFRESH_DAYS` | `7` | Vida refresh token |
 | `CORS_ALLOWED_ORIGINS` | - | Orígenes permitidos (CSV) |
@@ -114,3 +113,18 @@ Ver [`API.md`](./API.md) para detalle completo.
 - Throttling: `30/min` anónimo, `120/min` autenticado, `5/min` en login.
 - CORS configurable por `CORS_ALLOWED_ORIGINS`.
 - HSTS, SSL redirect, cookies seguras en producción.
+
+## Deploy en Render
+
+1. Crear servicio **Web Service** en Render.
+2. Conectar repositorio de GitHub.
+3. Configurar variables de entorno:
+   - `DJANGO_SECRET_KEY`: clave segura aleatoria
+   - `DJANGO_SETTINGS_ENV`: `production`
+   - `DJANGO_ALLOWED_HOSTS`: `*.onrender.com`
+   - Crear base de datos **PostgreSQL** en Render y copiar `DATABASE_URL`
+4. Render detecta `DATABASE_URL` automáticamente (configurado en `production.py` con `dj-database-url`).
+5. Build command: `pip install -r requirements.txt`
+6. Start command: `gunicorn gym_app.wsgi:application`
+
+> Agregar `gunicorn` a `requirements.txt` si no está presente.

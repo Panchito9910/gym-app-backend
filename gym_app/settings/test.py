@@ -1,6 +1,6 @@
 """Test settings.
 
-Uses SQLite in-memory database for fast test runs without requiring SQL Server.
+Uses SQLite in-memory database for fast test runs.
 """
 from .base import *  # noqa: F401,F403
 
