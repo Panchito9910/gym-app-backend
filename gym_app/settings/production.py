@@ -1,7 +1,11 @@
 """Production settings."""
+import dj_database_url
+
 from .base import *  # noqa: F401,F403
 
 DEBUG = False
+
+DATABASES['default'] = dj_database_url.config(conn_max_age=600, ssl_require=True)  # noqa: F405
 
 SECURE_SSL_REDIRECT = True
 SESSION_COOKIE_SECURE = True

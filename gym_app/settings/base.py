@@ -69,16 +69,12 @@ WSGI_APPLICATION = 'gym_app.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': config('DB_ENGINE', default='mssql'),
+        'ENGINE': config('DB_ENGINE', default='django.db.backends.postgresql'),
         'NAME': config('DB_NAME', default='gym_app'),
-        'USER': config('DB_USER', default='sa'),
+        'USER': config('DB_USER', default='postgres'),
         'PASSWORD': config('DB_PASSWORD', default=''),
         'HOST': config('DB_HOST', default='localhost'),
-        'PORT': config('DB_PORT', default=''),
-        'OPTIONS': {
-            'driver': config('DB_DRIVER', default='ODBC Driver 18 for SQL Server'),
-            'extra_params': 'TrustServerCertificate=yes',
-        },
+        'PORT': config('DB_PORT', default='5432'),
     }
 }
 
